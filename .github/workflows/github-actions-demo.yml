@@ -40,3 +40,21 @@ jobs:
     - name: Push Docker image to DockerHub
       run: |
         docker push stavtsdaka/githubactions:$NEW_VERSION
+
+    - name: SSH into EC2 and pull Docker image
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        port: 22
+        script: |
+          # Save the SSH key to a file
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          # Pull the latest Docker image from DockerHub
+          docker pull stavtsdaka/githubactions:$NEW_VERSION
+          
+          # Run the Docker container on EC2
+          docker run -d -p 5000:5000 stavtsdaka/githubactions:$NEW_VERSION
