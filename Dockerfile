@@ -5,10 +5,11 @@ COPY . .
 RUN mvn clean install
 
 # Stage 2: Run the application with JDK 17
-FROM openjdk:17-jre-slim
+FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=build /app/target/my-app-1.0-SNAPSHOT.jar myapp.jar
 CMD ["java", "-jar", "myapp.jar"]
+
 
 
 
