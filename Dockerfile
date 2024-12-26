@@ -1,15 +1,20 @@
-# Stage 1: Build the application with Maven
-FROM maven:3.9.2-openjdk-17 AS build
+# Stage 1: Build the Java app
+FROM maven:3.9.5-eclipse-temurin-17 as build
+
 WORKDIR /app
+
+# Copy source code and build the JAR
 COPY . .
-RUN mvn clean install
+RUN mvn clean package -DskipTests
 
-# Stage 2: Run the application with JDK 17
-FROM openjdk:17-jdk-slim
+# Stage 2: Run the app in a lightweight image
+FROM eclipse-temurin:17-jre-alpine
+
 WORKDIR /app
-COPY --from=build /app/target/my-app-1.0-SNAPSHOT.jar myapp.jar
-CMD ["java", "-jar", "myapp.jar"]
 
+# Copy the JAR file from the build stage
+COPY --from=build /app/target/*.jar app.jar
 
-
+# Command to run the JAR
+CMD ["java", "-jar", "app.jar"]
 
