@@ -1,10 +1,14 @@
-# Use Maven to build the application
-FROM maven:3.9.2-openjdk-11 AS build
+# Stage 1: Build the application with Maven
+FROM maven:3.9.2-openjdk-17 AS build
 WORKDIR /app
 COPY . .
 RUN mvn clean install
 
-# Run the application with the JRE (OpenJDK 11)
-CMD ["java", "-jar", "/app/target/myapp.jar"]
+# Stage 2: Run the application with JDK 17
+FROM openjdk:17-jre-slim
+WORKDIR /app
+COPY --from=build /app/target/my-app-1.0-SNAPSHOT.jar myapp.jar
+CMD ["java", "-jar", "myapp.jar"]
+
 
 
