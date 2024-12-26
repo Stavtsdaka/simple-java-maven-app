@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master  
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -12,20 +11,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Step to upgrade version from SNAPSHOT to a full version (if needed)
-    - name: Replace SNAPSHOT with version number
+    # Step to increase the patch version
+    - name: Increase patch version
       run: |
-        sed -i 's/-SNAPSHOT//g' pom.xml
-
-    # Step to bump the version using the bump action
-    - name: Bump version
-      id: bump
-      uses: mickem/gh-action-bump-maven-version@v1.0.0
-
-    # Save the new version as an environment variable to use in the next steps
-    - name: Set NEW_VERSION
-      run: echo "NEW_VERSION=${{ steps.bump.outputs.new_version }}" >> $GITHUB_ENV
-
+        VERSION_FILE="version.txt"
+        CURRENT_VERSION=$(cat $VERSION_FILE)
+        IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+        NEW_PATCH=$((patch + 1))
+        NEW_VERSION="$major.$minor.$NEW_PATCH"
+        echo "New version: $NEW_VERSION"
+        echo $NEW_VERSION > $VERSION_FILE
+        # Save the NEW_VERSION as an environment variable to use in the next steps
+        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+ 
     # Build Docker image
     - name: Build Docker image
       run: |
