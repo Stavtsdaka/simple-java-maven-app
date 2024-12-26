@@ -20,10 +20,11 @@ jobs:
     # Save the new version as an environment variable to use in the next steps
     - name: Set NEW_VERSION
       run: echo "NEW_VERSION=${{ steps.bump.outputs.new_version }}" >> $GITHUB_ENV
- 
+
     # Build Docker image
     - name: Build Docker image
       run: |
+        echo "Building Docker image with version: $NEW_VERSION"
         docker build -t stavtsdaka/githubactions:$NEW_VERSION .
 
     # Log in to DockerHub
@@ -36,6 +37,7 @@ jobs:
     # Push Docker image to DockerHub
     - name: Push Docker image to DockerHub
       run: |
+        echo "Pushing Docker image with version: $NEW_VERSION"
         docker push stavtsdaka/githubactions:$NEW_VERSION
 
     # SSH into EC2 and pull Docker image
@@ -51,11 +53,15 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
+          # Debugging: print NEW_VERSION
+          echo "Pulling Docker image with version: $NEW_VERSION"
+
           # Pull the latest Docker image from DockerHub
           docker pull stavtsdaka/githubactions:$NEW_VERSION
           
           # Run the Docker container on EC2
           docker run -d -p 5000:5000 stavtsdaka/githubactions:$NEW_VERSION
+
 
           
           # Run the Docker container on EC2
