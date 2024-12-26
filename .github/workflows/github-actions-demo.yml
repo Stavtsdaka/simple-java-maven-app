@@ -12,6 +12,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    # Step to upgrade version from SNAPSHOT to a full version (if needed)
+    - name: Replace SNAPSHOT with version number
+      run: |
+        sed -i 's/-SNAPSHOT//g' pom.xml
+
     # Step to bump the version using the bump action
     - name: Bump version
       id: bump
@@ -20,7 +25,7 @@ jobs:
     # Save the new version as an environment variable to use in the next steps
     - name: Set NEW_VERSION
       run: echo "NEW_VERSION=${{ steps.bump.outputs.new_version }}" >> $GITHUB_ENV
- 
+
     # Build Docker image
     - name: Build Docker image
       run: |
