@@ -23,7 +23,7 @@ jobs:
         echo $NEW_VERSION > $VERSION_FILE
         # Save the NEW_VERSION as an environment variable to use in the next steps
         echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-
+ 
     # Build Docker image
     - name: Build Docker image
       run: |
