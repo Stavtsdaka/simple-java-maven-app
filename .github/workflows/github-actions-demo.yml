@@ -39,4 +39,4 @@ jobs:
     # Push Docker image to DockerHub
     - name: Push Docker image to DockerHub
       run: |
-        docker push myusername/githubactions:$NEW_VERSION
+        docker push stavtsdaka/githubactions:$NEW_VERSION
